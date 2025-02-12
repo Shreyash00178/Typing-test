@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typing Speed Test</title>
+  <style>
+    /* Basic CSS Styling */
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f0f0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 800px;
+      text-align: center;
+      font-size: 18px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+      color: #4CAF50;
+    }
+
+    p {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: #555;
+    }
+
+    .text-display {
+      font-size: 28px;
+      margin-bottom: 30px;
+      padding: 20px;
+      border: 2px solid #ddd;
+      width: 100%;
+      min-height: 100px;
+      font-family: 'Courier New', monospace;
+      white-space: pre-wrap;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    .input-text {
+      width: 100%;
+      padding: 15px;
+      font-size: 24px;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      outline: none;
+    }
+
+    .input-text:focus {
+      border-color: #4CAF50;
+    }
+
+    .results {
+      margin-top: 20px;
+      font-size: 22px;
+      margin-bottom: 30px;
+    }
+
+    .results span {
+      font-weight: bold;
+      font-size: 28px;
+      color: #4CAF50;
+    }
+
+    button {
+      padding: 15px 30px;
+      font-size: 20px;
+      background-color: #4CAF50;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .timer {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Typing Speed Test</h1>
+    <p>Type the text below as quickly and accurately as possible.</p>
+
+    <div class="text-display" id="text-display"></div>
+
+    <input type="text" id="input-text" class="input-text" placeholder="Start typing here..." oninput="checkTyping()">
+
+    <div class="timer" id="time">0</div>
+
+    <div class="results">
+      <p>Speed: <span id="speed">0</span> WPM</p>
+      <p>Accuracy: <span id="accuracy">0</span>%</p>
+    </div>
+
+    <button onclick="startTest()">Start New Test</button>
+  </div>
+
+  <script>
+    // Array of passages
+    const passages = [
+      "The quick brown fox jumps over the lazy dog.",
+      "A journey of a thousand miles begins with a single step.",
+      "To be, or not to be, that is the question.",
+      "All that glitters is not gold.",
+      "The early bird catches the worm.",
+      "Better late than never.",
+      "Actions speak louder than words.",
+      "A watched pot never boils.",
+      "Don’t count your chickens before they hatch.",
+      "Rome wasn't built in a day.",
+      "The pen is mightier than the sword.",
+      "What doesn't kill you makes you stronger.",
+      "When in Rome, do as the Romans do.",
+      "Life is what happens when you're busy making other plans.",
+      "Time flies when you're having fun.",
+      "In the end, we only regret the chances we didn't take.",
+      "It’s never too late to be what you might have been.",
+      "A problem shared is a problem halved.",
+      "Do unto others as you would have them do unto you.",
+      "The only way to do great work is to love what you do."
+    ];
+
+    let startTime, endTime, correctWords = 0, totalWords = 0;
+    let currentPassage = "";
+    const inputField = document.getElementById('input-text');
+    const timeDisplay = document.getElementById('time');
+    const speedDisplay = document.getElementById('speed');
+    const accuracyDisplay = document.getElementById('accuracy');
+    const textDisplay = document.getElementById('text-display');
+
+    let interval;
+
+    // Function to start the test
+    function startTest() {
+      inputField.disabled = false;
+      inputField.value = '';
+      inputField.focus();
+      correctWords = 0;
+      totalWords = 0;
+      timeDisplay.innerText = '0';
+      speedDisplay.innerText = '0';
+      accuracyDisplay.innerText = '0';
+
+      // Select a random passage from the array
+      currentPassage = passages[Math.floor(Math.random() * passages.length)];
+      textDisplay.innerText = currentPassage;
+
+      startTime = new Date();
+      interval = setInterval(updateTime, 1000);  // Update time every second
+    }
+
+    // Function to update the timer
+    function updateTime() {
+      const currentTime = new Date();
+      const timeTaken = Math.floor((currentTime - startTime) / 1000);
+      timeDisplay.innerText = timeTaken;
+    }
+
+    // Function to check the typing input
+    function checkTyping() {
+      const typedText = inputField.value;
+      totalWords = typedText.split(' ').length;
+
+      if (typedText === currentPassage) {
+        endTime = new Date();
+        clearInterval(interval);  // Stop the timer
+
+        // Calculate time taken and typing speed
+        const timeTaken = Math.floor((endTime - startTime) / 1000);
+        const typingSpeed = Math.round((totalWords / timeTaken) * 60);
+        const accuracy = calculateAccuracy(currentPassage, typedText);
+
+        speedDisplay.innerText = typingSpeed;
+        accuracyDisplay.innerText = accuracy;
+
+        // Display test completion results
+        alert(`Test Completed!\nTime: ${timeTaken} seconds\nSpeed: ${typingSpeed} WPM\nAccuracy: ${accuracy}%`);
+      }
+    }
+
+    // Function to calculate typing accuracy
+    function calculateAccuracy(text, typedText) {
+      let correctCount = 0;
+      const textArr = text.split(' ');
+      const typedArr = typedText.split(' ');
+
+      // Compare words typed with the original text
+      for (let i = 0; i < Math.min(textArr.length, typedArr.length); i++) {
+        if (textArr[i] === typedArr[i]) {
+          correctCount++;
+        }
+      }
+
+      return Math.round((correctCount / textArr.length) * 100); // Calculate percentage accuracy
+    }
+  </script>
+
+</body>
+</html>
